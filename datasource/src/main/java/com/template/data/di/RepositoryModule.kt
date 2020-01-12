@@ -1,6 +1,10 @@
 package com.template.data.di
 
-import com.template.data.repositories.apirepositories.UserRepository
+import com.template.data.repositories.apirepositories.UserAPiRepository
+import com.template.data.repositories.roomrepositories.UsersDbRepository
+import com.template.domain.di.DiConstants
+import com.template.domain.repositories.UsersRepository
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
 /**
@@ -8,12 +12,11 @@ import org.koin.dsl.module
  * amoskrr@gmail.com
  */
 
-class RepositoryModule{
-companion object{
-  val repositoryModule= module {
-    single {
-      UserRepository(get())
+class RepositoryModule {
+  companion object {
+    val repositoryModule = module {
+      single(named(DiConstants.API)) { UserAPiRepository(get()) as UsersRepository }
+      single(named(DiConstants.DB)) { UsersDbRepository() as UsersRepository }
     }
   }
-}
 }

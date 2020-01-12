@@ -2,8 +2,8 @@ package com.template.viewmodels
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.template.data.repositories.apirepositories.UserRepository
 import com.template.domain.models.GithubUser
+import com.template.domain.repositories.UsersRepository
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -13,7 +13,7 @@ import io.reactivex.schedulers.Schedulers
  * amoskrr@gmail.com
  */
 
-class UserViewModel(userRepository: UserRepository) : ViewModel() {
+class UserViewModel(userRepository: UsersRepository) : ViewModel() {
   var userapiRepository = userRepository
   lateinit var compositeDisposable: CompositeDisposable
   var userLiveData = MutableLiveData<List<GithubUser>>()
@@ -21,7 +21,7 @@ class UserViewModel(userRepository: UserRepository) : ViewModel() {
 
   fun getUsers() {
     compositeDisposable = CompositeDisposable()
-    val disposable = userapiRepository.getAllUsers()
+    val disposable = userapiRepository.getUsers()
       .subscribeOn(Schedulers.io())
       .observeOn(AndroidSchedulers.mainThread())
       .subscribe({
