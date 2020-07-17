@@ -1,2 +1,3 @@
+include ':interactors'
 include ':app', ':viewmodels', ':datasource', ':domain'
 rootProject.name='KotlinMVVM'

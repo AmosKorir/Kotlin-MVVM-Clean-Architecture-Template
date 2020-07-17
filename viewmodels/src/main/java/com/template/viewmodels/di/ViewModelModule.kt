@@ -16,7 +16,7 @@ class ViewModelModule {
     val datamodulepass = DataModule
     val viewModelModule = module {
       viewModel {
-        UserViewModel(get(named(DiConstants.API)))
+        UserViewModel(get())
       }
     }
   }

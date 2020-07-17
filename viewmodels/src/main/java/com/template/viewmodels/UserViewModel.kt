@@ -1,40 +1,54 @@
 package com.template.viewmodels
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.amoskorir.usecaseinteractors.usecases.UseCase
+
+import com.amoskorir.usecaseinteractors.usecases.interfaces.UserUseCase
 import com.template.domain.models.GithubUser
-import com.template.domain.repositories.UsersRepository
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
+
 
 /**
  * Created by Korir on 1/11/20.
  * amoskrr@gmail.com
  */
 
-class UserViewModel(userRepository: UsersRepository) : ViewModel() {
-  var userapiRepository = userRepository
-  lateinit var compositeDisposable: CompositeDisposable
-  var userLiveData = MutableLiveData<List<GithubUser>>()
-  var errorLiveData = MutableLiveData<Throwable>()
+class UserViewModel(private val userUseCase: UserUseCase) : ViewModel() {
+    private var stateMediatorLiveData = MediatorLiveData<State>()
 
-  fun getUsers() {
-    compositeDisposable = CompositeDisposable()
-    val disposable = userapiRepository.getUsers()
-      .subscribeOn(Schedulers.io())
-      .observeOn(AndroidSchedulers.mainThread())
-      .subscribe({
-        userLiveData.postValue(it)
-      }, {
-        handleError(it)
-      })
-    compositeDisposable.add(disposable)
-  }
+    sealed class State {
+        data class Users(val users: List<GithubUser>) : State()
+        data class Profile(val user: GithubUser)
+        object ShowLoading : State()
+        object ShowContent : State()
+        object ShowError : State()
+    }
 
-  fun handleError(throwable: Throwable) {
-    errorLiveData.postValue(throwable)
-  }
+    init {
+        stateMediatorLiveData = MediatorLiveData<State>()
+
+        stateMediatorLiveData.addSource(userUseCase.getLiveData(), ::onFetchUsers)
+
+    }
+
+    fun getState(): LiveData<State> = stateMediatorLiveData
+
+    fun fetchUsers() {
+        stateMediatorLiveData.value = State.ShowLoading
+        userUseCase.execute()
+    }
+
+    private fun onFetchUsers(result: UserUseCase.Result) {
+        when (result) {
+            is UserUseCase.Result.OnSuccess -> {
+                stateMediatorLiveData.value = State.Users(result.memes)
+                stateMediatorLiveData.value = State.ShowContent
+            }
+            is UserUseCase.Result.OnError -> stateMediatorLiveData.value = State.ShowError
+        }
+    }
 
 
 }
