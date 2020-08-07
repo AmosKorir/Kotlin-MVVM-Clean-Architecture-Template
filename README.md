@@ -9,7 +9,7 @@ A modularized MVVM with dependecy injection. Dependency Injection with Koin
  **2 Viewmodels**
          This modules has all the viewmodels tha communicate with the use case. This can be merged with app module
       
- **3 UseCaes/ Interractors**
+ **3 UseCases/ Interactors**
         This is the module that hold the business logics and the use-case (deleteUser, getUsers)
   
   **4 datasource**
